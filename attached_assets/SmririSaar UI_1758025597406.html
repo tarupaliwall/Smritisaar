@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmritiSaar - ML-Driven Case Law Retrieval and Summarization</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-red: #8b0000;
+            --primary-red-light: #cc0000;
+            --primary-red-dark: #660000;
+            --accent-gold: #ffd700;
+            --light-bg: #fff5f5;
+            --light-card: #ffffff;
+            --light-text: #333333;
+            --light-border: #ffcccc;
+            --light-shadow: rgba(139, 0, 0, 0.1);
+            --dark-bg: #1a0000;
+            --dark-card: #2a0000;
+            --dark-text: #ffcccc;
+            --dark-border: #660000;
+            --dark-shadow: rgba(102, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--light-text);
+            line-height: 1.6;
+        }
+        
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-red-dark) 0%, var(--primary-red) 100%);
+            color: white;
+            padding: 25px 0;
+            border-bottom: 4px solid var(--accent-gold);
+        }
+        
+        body.dark-mode header {
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-dark) 100%);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-icon {
+            font-size: 32px;
+            margin-right: 15px;
+            color: var(--accent-gold);
+        }
+        
+        .logo-text {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .tagline {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 5px;
+            margin-left: 47px;
+        }
+        
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .search-section {
+            background: var(--light-card);
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px var(--light-shadow);
+            border: 1px solid var(--light-border);
+        }
+        
+        body.dark-mode .search-section {
+            background: var(--dark-card);
+            box-shadow: 0 5px 15px var(--dark-shadow);
+            border: 1px solid var(--dark-border);
+        }
+        
+        .search-box {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 16px 20px;
+            border: 2px solid var(--light-border);
+            border-radius: 8px 0 0 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background: var(--light-card);
+            color: var(--light-text);
+        }
+        
+        body.dark-mode .search-input {
+            background: var(--dark-card);
+            color: var(--dark-text);
+            border: 2px solid var(--dark-border);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-red);
+        }
+        
+        .search-button {
+            background: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 0 25px;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .search-button:hover {
+            background: var(--primary-red-dark);
+        }
+        
+        .search-examples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .example-chip {
+            background: #ffe6e6;
+            color: var(--primary-red);
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+            border: 1px solid var(--light-border);
+        }
+        
+        body.dark-mode .example-chip {
+            background: #330000;
+            color: #ff9999;
+            border: 1px solid var(--dark-border);
+        }
+        
+        .example-chip:hover {
+            background: #ffcccc;
+        }
+        
+        body.dark-mode .example-chip:hover {
+            background: #550000;
+        }
+        
+        .advanced-section {
+            background: var(--light-card);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px var(--light-shadow);
+            border: 1px solid var(--light-border);
+        }
+        
+        body.dark-mode .advanced-section {
+            background: var(--dark-card);
+            box-shadow: 0 5px 15px var(--dark-shadow);
+            border: 1px solid var(--dark-border);
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-red);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ffe6e6;
+        }
+        
+        body.dark-mode .section-title {
+            color: #ff9999;
+            border-bottom: 2px solid #330000;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .filter-group {
+            margin-bottom: 15px;
+        }
+        
+        .filter-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--primary-red);
+        }
+        
+        body.dark-mode .filter-label {
+            color: #ff9999;
+        }
+        
+        .filter-select, .filter-date {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--light-border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--light-card);
+            cursor: pointer;
+            color: var(--light-text);
+        }
+        
+        body.dark-mode .filter-select, 
+        body.dark-mode .filter-date {
+            background: var(--dark-card);
+            color: var(--dark-text);
+            border: 2px solid var(--dark-border);
+        }
+        
+        .filter-select:focus, .filter-date:focus {
+            outline: none;
+            border-color: var(--primary-red);
+        }
+        
+        .date-input-container {
+            position: relative;
+        }
+        
+        .date-input-container::after {
+            content: '\f073';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            pointer-events: none;
+        }
+        
+        .pipeline-section {
+            background: var(--light-card);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px var(--light-shadow);
+            border: 1px solid var(--light-border);
+        }
+        
+        body.dark-mode .pipeline-section {
+            background: var(--dark-card);
+            box-shadow: 0 5px 15px var(--dark-shadow);
+            border: 1px solid var(--dark-border);
+        }
+        
+        .pipeline-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 40px 0;
+        }
+        
+        .pipeline-steps::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--light-border);
+            z-index: 1;
+        }
+        
+        body.dark-mode .pipeline-steps::before {
+            background: var(--dark-border);
+        }
+        
+        .pipeline-step {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            width: 20%;
+        }
+        
+        .step-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--light-card);
+            border: 4px solid var(--light-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 30px;
+            color: var(--primary-red);
+            transition: all 0.3s;
+        }
+        
+        body.dark-mode .step-icon {
+            background: var(--dark-card);
+            border: 4px solid var(--dark-border);
+            color: #ff9999;
+        }
+        
+        .pipeline-step.active .step-icon {
+            background: var(--primary-red);
+            color: white;
+            border-color: var(--primary-red);
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--primary-red);
+        }
+        
+        body.dark-mode .step-title {
+            color: #ff9999;
+        }
+        
+        .step-desc {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        body.dark-mode .step-desc {
+            color: #cc9999;
+        }
+        
+        .results-section {
+            background: var(--light-card);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px var(--light-shadow);
+            border: 1px solid var(--light-border);
+        }
+        
+        body.dark-mode .results-section {
+            background: var(--dark-card);
+            box-shadow: 0 5px 15px var(--dark-shadow);
+            border: 1px solid var(--dark-border);
+        }
+        
+        .result-count {
+            font-size: 16px;
+            color: var(--primary-red);
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        body.dark-mode .result-count {
+            color: #ff9999;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        body.dark-mode .no-results {
+            color: #cc9999;
+        }
+        
+        .case-card {
+            border: 1px solid var(--light-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: var(--light-card);
+        }
+        
+        body.dark-mode .case-card {
+            border: 1px solid var(--dark-border);
+            background: var(--dark-card);
+        }
+        
+        .case-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px var(--light-shadow);
+        }
+        
+        body.dark-mode .case-card:hover {
+            box-shadow: 0 8px 20px var(--dark-shadow);
+        }
+        
+        .case-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-red);
+            margin-bottom: 10px;
+        }
+        
+        body.dark-mode .case-title {
+            color: #ff9999;
+        }
+        
+        .case-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        body.dark-mode .case-details {
+            color: #cc9999;
+        }
+        
+        .case-detail {
+            display: flex;
+            align-items: center;
+        }
+        
+        .case-detail i {
+            margin-right: 5px;
+            color: var(--primary-red);
+        }
+        
+        body.dark-mode .case-detail i {
+            color: #ff9999;
+        }
+        
+        .case-summary {
+            color: #444;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #fff5f5;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-red);
+            display: none;
+        }
+        
+        body.dark-mode .case-summary {
+            background: #330000;
+            color: #ffcccc;
+            border-left: 4px solid var(--primary-red);
+        }
+        
+        .case-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-button {
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .view-full {
+            background: var(--primary-red);
+            color: white;
+            border: none;
+        }
+        
+        .view-full:hover {
+            background: var(--primary-red-dark);
+        }
+        
+        .ai-summary {
+            background: var(--light-card);
+            color: var(--primary-red);
+            border: 1px solid var(--primary-red);
+        }
+        
+        body.dark-mode .ai-summary {
+            background: var(--dark-card);
+            color: #ff9999;
+            border: 1px solid #ff9999;
+        }
+        
+        .ai-summary:hover {
+            background: #ffe6e6;
+        }
+        
+        body.dark-mode .ai-summary:hover {
+            background: #330000;
+        }
+        
+        .tech-section {
+            background: var(--light-card);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px var(--light-shadow);
+            border: 1px solid var(--light-border);
+        }
+        
+        body.dark-mode .tech-section {
+            background: var(--dark-card);
+            box-shadow: 0 5px 15px var(--dark-shadow);
+            border: 1px solid var(--dark-border);
+        }
+        
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .tech-card {
+            border: 1px solid var(--light-border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+            background: var(--light-card);
+        }
+        
+        body.dark-mode .tech-card {
+            border: 1px solid var(--dark-border);
+            background: var(--dark-card);
+        }
+        
+        .tech-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .tech-icon {
+            font-size: 40px;
+            color: var(--primary-red);
+            margin-bottom: 15px;
+        }
+        
+        body.dark-mode .tech-icon {
+            color: #ff9999;
+        }
+        
+        .tech-name {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-red);
+        }
+        
+        body.dark-mode .tech-name {
+            color: #ff9999;
+        }
+        
+        .tech-desc {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        body.dark-mode .tech-desc {
+            color: #cc9999;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: #666;
+            font-size: 14px;
+            border-top: 1px solid var(--light-border);
+            margin-top: 40px;
+        }
+        
+        body.dark-mode footer {
+            color: #cc9999;
+            border-top: 1px solid var(--dark-border);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-red);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        body.dark-mode .loading-spinner {
+            border: 4px solid #330000;
+            border-top: 4px solid #ff9999;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                border-radius: 8px;
+                margin-bottom: 10px;
+            }
+            
+            .search-button {
+                border-radius: 8px;
+                padding: 12px;
+            }
+            
+            .pipeline-steps {
+                flex-direction: column;
+                align-items: center;
+                gap: 30px;
+            }
+            
+            .pipeline-steps::before {
+                display: none;
+            }
+            
+            .pipeline-step {
+                width: 100%;
+            }
+            
+            .case-details {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-balance-scale"></i></div>
+                <div>
+                    <div class="logo-text">SmritiSaar</div>
+                    <div class="tagline">ML-Driven Case Law Retrieval and Summarization</div>
+                </div>
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i> Dark Mode
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="search-section">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Enter your legal query or case reference...">
+                <button class="search-button">Search</button>
+            </div>
+            <div class="search-examples">
+                <div class="example-chip">Basic structure doctrine</div>
+                <div class="example-chip">Article 14 equality cases</div>
+                <div class="example-chip">Landmark judgments on free speech</div>
+                <div class="example-chip">IPC Section 420 precedents</div>
+            </div>
+        </section>
+
+        <section class="advanced-section">
+            <h2 class="section-title">Advanced Filters</h2>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Subject Area</label>
+                    <select class="filter-select">
+                        <option>All Areas</option>
+                        <option>Constitutional Law</option>
+                        <option>Criminal Law</option>
+                        <option>Civil Law</option>
+                        <option>Property Law</option>
+                        <option>Contract Law</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Court Type</label>
+                    <select class="filter-select">
+                        <option>All Courts</option>
+                        <option>Supreme Court</option>
+                        <option>High Courts</option>
+                        <option>District Courts</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Precedent Value</label>
+                    <select class="filter-select">
+                        <option>All Values</option>
+                        <option>Landmark Judgment</option>
+                        <option>Binding Precedent</option>
+                        <option>Persuasive Precedent</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">From Date</label>
+                    <div class="date-input-container">
+                        <input type="date" class="filter-date" id="from-date">
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">To Date</label>
+                    <div class="date-input-container">
+                        <input type="date" class="filter-date" id="to-date">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="pipeline-section">
+            <h2 class="section-title">BERT-FAISS-BART Pipeline</h2>
+            <div class="pipeline-steps">
+                <div class="pipeline-step active">
+                    <div class="step-icon"><i class="fas fa-search"></i></div>
+                    <div class="step-title">Query Processing</div>
+                    <div class="step-desc">SpaCy + regex for legal tokenization</div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-icon"><i class="fas fa-brain"></i></div>
+                    <div class="step-title">BERT Encoding</div>
+                    <div class="step-desc">768-dim semantic embeddings</div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-icon"><i class="fas fa-database"></i></div>
+                    <div class="step-title">FAISS Retrieval</div>
+                    <div class="step-desc">IVF-PQ indexing for O(log N) search</div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+                    <div class="step-title">BART Summarization</div>
+                    <div class="step-desc">Context-aware abstractive summary</div>
+                </div>
+                <div class="pipeline-step">
+                    <div class="step-icon"><i class="fas fa-chart-bar"></i></div>
+                    <div class="step-title">Hybrid Ranking</div>
+                    <div class="step-desc">BM25+BERT scoring (θ=0.7 threshold)</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="loading">
+            <div class="loading-spinner"></div>
+            <p>Processing your query with BERT-FAISS-BART pipeline...</p>
+        </div>
+
+        <section class="results-section">
+            <h2 class="section-title">Search Results</h2>
+            <div class="result-count">Enter a query to search our database of legal cases</div>
+            
+            <div class="no-results">
+                <i class="fas fa-search" style="font-size: 48px; margin-bottom: 15px;"></i>
+                <p>No search performed yet. Enter a legal query above to find relevant cases.</p>
+            </div>
+        </section>
+
+        <section class="tech-section">
+            <h2 class="section-title">Technology Stack</h2>
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <div class="tech-icon"><i class="fas fa-robot"></i></div>
+                    <div class="tech-name">BERT-base-uncased</div>
+                    <div class="tech-desc">768-dimensional embeddings for semantic understanding of legal queries and documents.</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon"><i class="fas fa-search"></i></div>
+                    <div class="tech-name">FAISS IVF-PQ</div>
+                    <div class="tech-desc">Approximate nearest neighbor search with nlist=100 for efficient retrieval from large case databases.</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon"><i class="fas fa-file-alt"></i></div>
+                    <div class="tech-name">BART-large-CNN</div>
+                    <div class="tech-desc">Fine-tuned on legal texts for coherent and accurate summarization of case judgments.</div>
+                </div>
+                <div class="tech-card">
+                    <div class="tech-icon"><i class="fas fa-code"></i></div>
+                    <div class="tech-name">SpaCy + Regex</div>
+                    <div class="tech-desc">Legal-specific preprocessing for citation recognition and legal tokenization.</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2023 SmritiSaar - ML-Driven Case Law Retrieval and Summarization</p>
+            <p>BERT-FAISS-BART Pipeline | Enhancing Legal Efficiency with AI</p>
+            <p>Disclaimer: This is a demonstration interface. Not a substitute for professional legal advice.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+            }
+        });
+        
+        // Add functionality to example chips
+        document.querySelectorAll('.example-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelector('.search-input').value = chip.textContent;
+                performSearch();
+            });
+        });
+        
+        // Search functionality
+        function performSearch() {
+            const searchTerm = document.querySelector('.search-input').value.trim();
+            if (searchTerm) {
+                // Show loading indicator
+                document.querySelector('.loading').style.display = 'block';
+                document.querySelector('.results-section').style.opacity = '0.5';
+                
+                // Animate pipeline steps
+                const steps = document.querySelectorAll('.pipeline-step');
+                steps.forEach(step => step.classList.remove('active'));
+                
+                let step = 0;
+                const animateSteps = setInterval(() => {
+                    if (step < steps.length) {
+                        steps[step].classList.add('active');
+                        step++;
+                    } else {
+                        clearInterval(animateSteps);
+                        
+                        // Show results after animation completes
+                        setTimeout(() => {
+                            document.querySelector('.result-count').textContent = `Search completed. No cases found in demo mode.`;
+                            document.querySelector('.no-results').innerHTML = `
+                                <i class="fas fa-database" style="font-size: 48px; margin-bottom: 15px;"></i>
+                                <p>In the full application, your query would search our 7GB database of legal cases.</p>
+                                <p style="margin-top: 10px; font-size: 14px;">Try one of the example queries to see the interface in action.</p>
+                            `;
+                            document.querySelector('.loading').style.display = 'none';
+                            document.querySelector('.results-section').style.opacity = '1';
+                            
+                            // Scroll to results
+                            document.querySelector('.results-section').scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                        }, 500);
+                    }
+                }, 600);
+            }
+        }
+        
+        // Add event listener to search button
+        document.querySelector('.search-button').addEventListener('click', performSearch);
+        
+        // Allow pressing Enter to search
+        document.querySelector('.search-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // Initialize date inputs with placeholder text
+        const today = new Date();
+        const formattedToday = today.toISOString().split('T')[0];
+        
+        // Set default dates (30 days range)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(today.getDate() - 30);
+        const formattedThirtyDaysAgo = thirtyDaysAgo.toISOString().split('T')[0];
+        
+        document.getElementById('from-date').value = formattedThirtyDaysAgo;
+        document.getElementById('to-date').value = formattedToday;
+        
+        // Add event listeners to filter selects
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', performSearch);
+        });
+        
+        // Add event listeners to date inputs
+        document.querySelectorAll('.filter-date').forEach(dateInput => {
+            dateInput.addEventListener('change', performSearch);
+        });
+    </script>
+</body>
+</html>
