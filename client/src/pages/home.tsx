@@ -8,6 +8,7 @@ import { SearchSection } from "@/components/search-section";
 import { AdvancedFilters } from "@/components/advanced-filters";
 import { MLPipeline } from "@/components/ml-pipeline";
 import { ResultsSection } from "@/components/results-section";
+import { DatasetUpload } from "@/components/dataset-upload";
 import { useTheme } from "@/components/theme-provider";
 
 import type { SearchRequest, SearchResponse, SearchFilters, LegalCase } from "@/types";
@@ -21,6 +22,7 @@ export default function Home() {
   const [searchResults, setSearchResults] = useState<LegalCase[]>([]);
   const [totalResults, setTotalResults] = useState(0);
   const [processingSteps, setProcessingSteps] = useState<string[]>([]);
+  const [showUpload, setShowUpload] = useState(false);
 
   // Search mutation
   const searchMutation = useMutation({
@@ -109,6 +111,17 @@ export default function Home() {
     analysisMutation.mutate({ caseId, analysisType: 'summary' });
   };
 
+  const handleUploadComplete = (message: string, count: number) => {
+    setShowUpload(false);
+    toast({
+      title: "Dataset Integration Complete",
+      description: message,
+    });
+    
+    // Refresh the page data if needed
+    queryClient.invalidateQueries({ queryKey: ['/api/filters'] });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -126,20 +139,34 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <button
-              onClick={toggleTheme}
-              className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-              data-testid="button-theme-toggle"
-            >
-              <i className={`fas ${isDarkMode ? 'fa-sun' : 'fa-moon'} text-sm`} />
-              <span className="text-sm">{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowUpload(!showUpload)}
+                className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                data-testid="button-toggle-upload"
+              >
+                <i className="fas fa-database text-sm" />
+                <span className="text-sm">Manage Dataset</span>
+              </button>
+              <button
+                onClick={toggleTheme}
+                className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                data-testid="button-theme-toggle"
+              >
+                <i className={`fas ${isDarkMode ? 'fa-sun' : 'fa-moon'} text-sm`} />
+                <span className="text-sm">{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {showUpload && (
+          <DatasetUpload onUploadComplete={handleUploadComplete} />
+        )}
+        
         <SearchSection
           onSearch={handleSearch}
           isLoading={searchMutation.isPending}

@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as XLSX from 'xlsx';
+import AdmZip from 'adm-zip';
 import { storage } from '../storage';
 import { type InsertLegalCase } from '@shared/schema';
 
@@ -17,14 +18,17 @@ export async function processCaseDataset(filePath: string): Promise<number> {
     const fileExtension = path.extname(filePath).toLowerCase();
     let rows: Record<string, any>[] = [];
 
-    if (fileExtension === '.xlsx' || fileExtension === '.xls') {
+    if (fileExtension === '.zip') {
+      // Process ZIP file
+      rows = await processZipFile(filePath);
+    } else if (fileExtension === '.xlsx' || fileExtension === '.xls') {
       // Process Excel file
       rows = await processExcelFile(filePath);
     } else if (fileExtension === '.csv') {
       // Process CSV file
       rows = await processCsvFile(filePath);
     } else {
-      throw new Error('Unsupported file format. Please use .xlsx, .xls, or .csv files.');
+      throw new Error('Unsupported file format. Please use .zip, .xlsx, .xls, or .csv files.');
     }
 
     let processedCount = 0;
@@ -42,6 +46,56 @@ export async function processCaseDataset(filePath: string): Promise<number> {
     console.error('Error processing dataset:', error);
     throw new Error('Failed to process case dataset');
   }
+}
+
+async function processZipFile(filePath: string): Promise<Record<string, any>[]> {
+  const zip = new AdmZip(filePath);
+  const zipEntries = zip.getEntries();
+  
+  let allRows: Record<string, any>[] = [];
+
+  for (const zipEntry of zipEntries) {
+    if (zipEntry.isDirectory) continue;
+    
+    const fileName = zipEntry.entryName;
+    const fileExtension = path.extname(fileName).toLowerCase();
+    
+    if (['.xlsx', '.xls', '.csv'].includes(fileExtension)) {
+      console.log(`Processing file from ZIP: ${fileName}`);
+      
+      // Extract file to temporary location
+      const tempDir = path.join(process.cwd(), 'temp');
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { recursive: true });
+      }
+      
+      const tempFilePath = path.join(tempDir, fileName);
+      fs.writeFileSync(tempFilePath, zipEntry.getData());
+      
+      try {
+        let rows: Record<string, any>[] = [];
+        
+        if (fileExtension === '.csv') {
+          rows = await processCsvFile(tempFilePath);
+        } else {
+          rows = await processExcelFile(tempFilePath);
+        }
+        
+        allRows = allRows.concat(rows);
+        
+        // Clean up temp file
+        fs.unlinkSync(tempFilePath);
+      } catch (error) {
+        console.error(`Error processing ${fileName}:`, error);
+        // Clean up temp file on error
+        if (fs.existsSync(tempFilePath)) {
+          fs.unlinkSync(tempFilePath);
+        }
+      }
+    }
+  }
+
+  return allRows;
 }
 
 async function processExcelFile(filePath: string): Promise<Record<string, any>[]> {
