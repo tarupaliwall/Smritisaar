@@ -57,15 +57,15 @@ export function AdvancedFilters({ filters, onFiltersChange, onApplyFilters }: Ad
                 Court Type
               </Label>
               <Select
-                value={filters.courtType || ""}
-                onValueChange={(value) => updateFilter('courtType', value === "" ? undefined : value)}
+                value={filters.courtType || "__all__"}
+                onValueChange={(value) => updateFilter('courtType', value === "__all__" ? undefined : value)}
                 data-testid="select-court-type"
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="All Courts" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Courts</SelectItem>
+                  <SelectItem value="__all__">All Courts</SelectItem>
                   {filterOptions?.courtTypes.map((type) => (
                     <SelectItem key={type} value={type}>
                       {type}
@@ -80,15 +80,15 @@ export function AdvancedFilters({ filters, onFiltersChange, onApplyFilters }: Ad
                 Jurisdiction
               </Label>
               <Select
-                value={filters.jurisdiction || ""}
-                onValueChange={(value) => updateFilter('jurisdiction', value === "" ? undefined : value)}
+                value={filters.jurisdiction || "__all__"}
+                onValueChange={(value) => updateFilter('jurisdiction', value === "__all__" ? undefined : value)}
                 data-testid="select-jurisdiction"
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="All Jurisdictions" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Jurisdictions</SelectItem>
+                  <SelectItem value="__all__">All Jurisdictions</SelectItem>
                   {filterOptions?.jurisdictions.map((jurisdiction) => (
                     <SelectItem key={jurisdiction} value={jurisdiction}>
                       {jurisdiction}
@@ -103,15 +103,15 @@ export function AdvancedFilters({ filters, onFiltersChange, onApplyFilters }: Ad
                 Case Type
               </Label>
               <Select
-                value={filters.caseType || ""}
-                onValueChange={(value) => updateFilter('caseType', value === "" ? undefined : value)}
+                value={filters.caseType || "__all__"}
+                onValueChange={(value) => updateFilter('caseType', value === "__all__" ? undefined : value)}
                 data-testid="select-case-type"
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="All Case Types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Case Types</SelectItem>
+                  <SelectItem value="__all__">All Case Types</SelectItem>
                   {filterOptions?.caseTypes.map((type) => (
                     <SelectItem key={type} value={type}>
                       {type}
@@ -126,15 +126,15 @@ export function AdvancedFilters({ filters, onFiltersChange, onApplyFilters }: Ad
                 Judge
               </Label>
               <Select
-                value={filters.judge || ""}
-                onValueChange={(value) => updateFilter('judge', value === "" ? undefined : value)}
+                value={filters.judge || "__all__"}
+                onValueChange={(value) => updateFilter('judge', value === "__all__" ? undefined : value)}
                 data-testid="select-judge"
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="All Judges" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Judges</SelectItem>
+                  <SelectItem value="__all__">All Judges</SelectItem>
                   {filterOptions?.judges.map((judge) => (
                     <SelectItem key={judge} value={judge}>
                       {judge}
