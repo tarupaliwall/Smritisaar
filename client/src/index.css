@@ -1,0 +1,134 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* SmritiSaar Color Palette - Extracted from design reference */
+  --primary-red: hsl(0, 100%, 27%);
+  --primary-red-light: hsl(0, 100%, 40%);
+  --primary-red-dark: hsl(0, 100%, 20%);
+  --accent-gold: hsl(51, 100%, 50%);
+  --light-bg: hsl(350, 100%, 98%);
+  --light-card: hsl(0, 0%, 100%);
+  --light-text: hsl(0, 0%, 20%);
+  --light-border: hsl(350, 30%, 90%);
+  --light-shadow: hsla(0, 100%, 27%, 0.1);
+  --dark-bg: hsl(0, 100%, 5%);
+  --dark-card: hsl(0, 100%, 8%);
+  --dark-text: hsl(350, 30%, 85%);
+  --dark-border: hsl(0, 100%, 20%);
+  --dark-shadow: hsla(0, 100%, 27%, 0.3);
+
+  /* Theme Variables */
+  --background: var(--light-bg);
+  --foreground: var(--light-text);
+  --card: var(--light-card);
+  --card-foreground: var(--light-text);
+  --popover: var(--light-card);
+  --popover-foreground: var(--light-text);
+  --primary: var(--primary-red);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(350, 60%, 95%);
+  --secondary-foreground: var(--primary-red);
+  --muted: hsl(350, 30%, 96%);
+  --muted-foreground: hsl(0, 0%, 40%);
+  --accent: var(--accent-gold);
+  --accent-foreground: var(--primary-red);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: var(--light-border);
+  --input: hsl(350, 30%, 94%);
+  --ring: var(--primary-red);
+  --chart-1: var(--primary-red);
+  --chart-2: var(--accent-gold);
+  --chart-3: hsl(350, 60%, 85%);
+  --chart-4: hsl(0, 100%, 40%);
+  --chart-5: hsl(51, 80%, 60%);
+  --sidebar: var(--light-card);
+  --sidebar-foreground: var(--light-text);
+  --sidebar-primary: var(--primary-red);
+  --sidebar-primary-foreground: hsl(0, 0%, 100%);
+  --sidebar-accent: hsl(350, 60%, 95%);
+  --sidebar-accent-foreground: var(--primary-red);
+  --sidebar-border: var(--light-border);
+  --sidebar-ring: var(--primary-red);
+  --font-sans: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: 'Consolas', monospace;
+  --radius: 0.75rem;
+  --shadow-2xs: 0px 2px 0px 0px hsla(0, 100%, 27%, 0.05);
+  --shadow-xs: 0px 2px 0px 0px hsla(0, 100%, 27%, 0.05);
+  --shadow-sm: 0px 2px 0px 0px hsla(0, 100%, 27%, 0.05), 0px 1px 2px -1px hsla(0, 100%, 27%, 0.05);
+  --shadow: 0px 2px 0px 0px hsla(0, 100%, 27%, 0.05), 0px 1px 2px -1px hsla(0, 100%, 27%, 0.05);
+  --shadow-md: 0px 2px 0px 0px hsla(0, 100%, 27%, 0.05), 0px 2px 4px -1px hsla(0, 100%, 27%, 0.05);
+  --shadow-lg: 0px 2px 0px 0px hsla(0, 100%, 27%, 0.05), 0px 4px 6px -1px hsla(0, 100%, 27%, 0.05);
+  --shadow-xl: 0px 2px 0px 0px hsla(0, 100%, 27%, 0.05), 0px 8px 10px -1px hsla(0, 100%, 27%, 0.05);
+  --shadow-2xl: 0px 2px 0px 0px hsla(0, 100%, 27%, 0.05);
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
+}
+
+.dark {
+  --background: var(--dark-bg);
+  --foreground: var(--dark-text);
+  --card: var(--dark-card);
+  --card-foreground: var(--dark-text);
+  --popover: var(--dark-card);
+  --popover-foreground: var(--dark-text);
+  --primary: var(--primary-red-light);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(0, 100%, 10%);
+  --secondary-foreground: hsl(350, 60%, 80%);
+  --muted: hsl(0, 100%, 10%);
+  --muted-foreground: hsl(350, 30%, 60%);
+  --accent: var(--accent-gold);
+  --accent-foreground: hsl(0, 100%, 20%);
+  --destructive: hsl(0, 62%, 30%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: var(--dark-border);
+  --input: hsl(0, 100%, 15%);
+  --ring: var(--primary-red-light);
+  --sidebar: var(--dark-card);
+  --sidebar-foreground: var(--dark-text);
+  --sidebar-primary: var(--primary-red-light);
+  --sidebar-primary-foreground: hsl(0, 0%, 100%);
+  --sidebar-accent: hsl(0, 100%, 10%);
+  --sidebar-accent-foreground: hsl(350, 60%, 80%);
+  --sidebar-border: var(--dark-border);
+  --sidebar-ring: var(--primary-red-light);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    transition: all 0.3s ease;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+
+  .gradient-bg {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(0, 100%, 20%) 100%);
+  }
+
+  .pipeline-line {
+    background: linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 50%, hsl(var(--primary)) 100%);
+  }
+
+  .loading-spinner {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .search-suggestions {
+    backdrop-filter: blur(10px);
+    background: hsl(var(--card) / 0.9);
+  }
+}
